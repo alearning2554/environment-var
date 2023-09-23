@@ -3,11 +3,6 @@ on:
   push:
     branches:
       - dev
-  pull_request:
-    types:
-      - opened
-    branches:
-      - master
 env:
   MONGODB_DB_NAME: test
   MONGODB_CLUSTER_ADDRESS: ${{ vars.MONGODB_CLUSTER_ADDRESS }}
@@ -16,31 +11,12 @@ env:
   PORT: 8080
 jobs:
   dev:
+    strategy:
+      matrix:
+        operating-system: [ubuntu-latest,windows-latest]
     if: github.ref == 'refs/heads/dev'
     environment: development
-    runs-on: ubuntu-latest
-    steps:
-      - name: Get Code
-        uses: actions/checkout@v3
-      - name: Cache dependencies
-        uses: actions/cache@v3
-        with:
-          path: ~/.npm
-          key: npm-deps-${{ hashFiles('**/package-lock.json') }}
-      - name: Install dependencies
-        run: npm ci
-      - name: Run server
-        run: npm start & npx wait-on http://127.0.0.1:$PORT
-      - name: Run tests
-        run: npm test
-      - name: Output information
-        run: | 
-          echo "MONGODB_USERNAME: ${{ env.MONGODB_USERNAME}}"
-          echo "MONGODB_CLUSTER_ADDRESS: ${{ env.MONGODB_CLUSTER_ADDRESS}}"
-  prod:
-    if: github.ref == 'refs/heads/master'
-    environment: prod
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.operating-system }}
     steps:
       - name: Get Code
         uses: actions/checkout@v3
