@@ -15,9 +15,9 @@ jobs:
       matrix:
         operating-system: [ubuntu-latest,windows-latest]
         include:
-          - ubuntu-latest
+          - operating-system: ubuntu-latest
         exclude:
-          - windows-latest
+          - operating-system: windows-latest
     if: github.ref == 'refs/heads/dev'
     environment: development
     runs-on: ${{ matrix.operating-system }}
